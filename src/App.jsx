@@ -1,11 +1,8 @@
-import Projects from "./pages/Projects";
-import "./index.css";
+import AppRouter from "./routes/AppRouter";
 
-function App() {
-  return (
-    <div className="App">
-      <Projects />
-    </div>
+const App = () => {
+  return(
+    <AppRouter/>
   );
 }
 

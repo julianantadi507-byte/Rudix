@@ -1,25 +1,10 @@
-const API_URL = import.meta.env.VITE_API_URL;
+import api from "./axios";
 
-export const projectsAPI = {
-  getAll: async (token) => {
-    const response = await fetch(`${API_URL}/api/projets`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    return response.json();
-  },
+//Récupère tous les projets
+export const getProjects = () => {
+  return api.get("/api/groupe-5/projets");
+}
 
-  create: async (projectData, token) => {
-    const response = await fetch(`${API_URL}/api/projets`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        nom: projectData.nom,
-        description: projectData.description
-      })
-    });
-    return response.json();
-  }
-};
+export const createProject = (data) => {
+  return api.post("/api/groupe-5/projets", data);
+}
