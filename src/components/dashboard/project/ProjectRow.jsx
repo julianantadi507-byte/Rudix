@@ -6,7 +6,10 @@ export const ProjectRow = ({ project, onEdit, onDelete }) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
-  // Fermer le menu si on clique ailleurs sur la page
+  // Valeurs par défaut si les données manquent dans la DB
+  const progress = project.progression || 0; 
+  const status = project.status || "En cours";
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -18,51 +21,69 @@ export const ProjectRow = ({ project, onEdit, onDelete }) => {
   }, []);
 
   return (
-    <div className="group flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-all mb-2 relative">
-      <div className="flex items-center gap-4 flex-1">
-        <div className="p-2 self-start bg-[#633BBC]/10 rounded-lg text-[#633BBC]">
+    <div className="group grid grid-cols-[50px_1fr_120px_120px_150px_50px] items-center p-4 bg-white hover:bg-gray-50/50 transition-all relative border-b border-gray-50 last:border-0">
+      
+      {/* 1. CHECKBOX (Selection) */}
+      <div className="flex justify-center">
+        <input 
+          type="checkbox" 
+          className="w-4 h-4 rounded border-gray-300 text-[#633BBC] focus:ring-[#633BBC] cursor-pointer" 
+        />
+      </div>
+
+      {/* 2. DÉTAILS DU PROJET */}
+      <div className="flex items-center gap-4 overflow-hidden pl-6">
+        <div className="p-2 bg-[#633BBC]/10 rounded-lg text-[#633BBC] shrink-0">
           <Folder size={20} />
         </div>
-        
-        <div className="flex flex-col">
-          <span className="text-sm font-medium text-[#633BBC] hover:underline cursor-pointer">
+        <div className="flex flex-col overflow-hidden">
+          <span className="text-sm font-semibold text-gray-800 hover:text-[#633BBC] cursor-pointer truncate">
             {project.nom}
           </span>
-          <span className="text-sm text-gray-500 line-clamp-1">
-            {project.description}
+          <span className="text-xs text-gray-500 truncate">
+            {project.description || "Aucune description"}
           </span>
         </div>
       </div>
 
-      {/* Statut */}
-      <div className="hidden md:flex flex-1 justify-center">
-        <span className="px-2 py-1 text-[11px] font-medium bg-[#633BBC]/10 text-[#633BBC] border border-[#633BBC]/20 rounded-md">
-          {project.status || "14%"}
+      {/* 3. BARRE DE PROGRESSION */}
+      <div className="flex flex-col items-center gap-1.5 px-4">
+        <span className="text-[10px] font-bold text-gray-600">{progress}%</span>
+        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-[#633BBC] rounded-full transition-all duration-700" 
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {/* 4. STATUT */}
+      <div className="flex justify-center">
+        <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border ${
+          status === "Terminé" 
+          ? "bg-green-50 text-green-600 border-green-100" 
+          : "bg-[#633BBC]/5 text-[#633BBC] border-[#633BBC]/10"
+        }`}>
+          {status}
         </span>
       </div>
 
-      {/* Membres */}
-      <div className="hidden md:flex flex-1 justify-center items-center gap-2">
-        <span className="text-sm text-gray-400">{project.membre || "0"} membres</span>
+      {/* 5. DATE DE CRÉATION */}
+      <div className="text-center text-xs text-gray-500 font-medium">
+        {formatRelativeDate(project.createdAt || project.created_at)}
       </div>
 
-      {/* Date */}
-      <div className="hidden lg:flex flex-1 justify-center text-sm text-gray-500">
-        {formatRelativeDate(project.created_at)}
-      </div>
-
-      {/* Menu Actions */}
-      <div className="relative" ref={menuRef}>
+      {/* 6. MENU ACTIONS */}
+      <div className="flex justify-center relative" ref={menuRef}>
         <button 
           onClick={() => setShowMenu(!showMenu)}
-          className={`p-2 rounded-lg transition-colors cursor-pointer ${showMenu ? 'bg-gray-100 text-[#633BBC]' : 'text-gray-500 hover:text-[#633BBC] hover:bg-gray-50'}`}
+          className={`p-2 rounded-lg transition-colors cursor-pointer ${showMenu ? 'bg-gray-100 text-[#633BBC]' : 'text-gray-400 hover:text-[#633BBC] hover:bg-gray-100'}`}
         >
           <MoreHorizontal size={18} />
         </button>
 
-        {/* Le Dropdown */}
         {showMenu && (
-          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-[100] py-2 animate-in fade-in zoom-in duration-200">
+          <div className="absolute right-0 top-10 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-[100] py-2 animate-in fade-in zoom-in duration-200">
             <button 
               onClick={() => { onEdit(project); setShowMenu(false); }}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm cursor-pointer text-gray-700 hover:bg-gray-50 transition-colors"
@@ -70,9 +91,7 @@ export const ProjectRow = ({ project, onEdit, onDelete }) => {
               <Pencil size={14} className="text-[#633BBC]" />
               Modifier le projet
             </button>
-            
             <div className="h-[1px] bg-gray-50 my-1" />
-            
             <button 
               onClick={() => { onDelete(project.id); setShowMenu(false); }}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm cursor-pointer text-red-600 hover:bg-red-50 transition-colors"

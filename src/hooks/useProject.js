@@ -2,20 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { getProjects } from "@/api/projects.api";
 
 export const useProjects = () => {
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["projects"],
     queryFn: getProjects,
   });
 
   return {
-    projects : data || [],
+    projects: data || [], 
     isLoading,
     isError,
-    error,
   };
 };
